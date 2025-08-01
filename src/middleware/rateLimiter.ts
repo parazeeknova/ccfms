@@ -2,7 +2,7 @@ import rateLimit from 'express-rate-limit'
 
 export const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100,
+  max: 500,
   message: {
     error: 'Too many requests from this IP',
     retryAfter: '15 minutes',
@@ -35,7 +35,7 @@ export const heavyOperationLimiter = rateLimit({
 
 export const readLimiter = rateLimit({
   windowMs: 1 * 60 * 1000,
-  max: 60,
+  max: 200,
   message: {
     error: 'Too many read requests from this IP',
     retryAfter: '1 minute',
@@ -57,7 +57,7 @@ export const updateLimiter = rateLimit({
 
 export const healthCheckLimiter = rateLimit({
   windowMs: 1 * 60 * 1000,
-  max: 2,
+  max: 1,
   message: {
     error: 'Too many health check requests from this IP',
     retryAfter: '1 minute',

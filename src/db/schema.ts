@@ -10,7 +10,10 @@ export const vehicles = pgTable('vehicles', {
   registrationStatus: varchar('registration_status', { length: 20 }).notNull(),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
-})
+}, table => ({
+  fleetIdIdx: index('vehicles_fleet_id_idx').on(table.fleetId),
+  registrationStatusIdx: index('vehicles_registration_status_idx').on(table.registrationStatus),
+}))
 
 export const telemetry = pgTable('telemetry', {
   id: serial('id').primaryKey(),
@@ -27,6 +30,11 @@ export const telemetry = pgTable('telemetry', {
 }, table => ({
   vinTimestampIdx: index('telemetry_vin_timestamp_idx').on(table.vehicleVin, table.timestamp),
   timestampIdx: index('telemetry_timestamp_idx').on(table.timestamp),
+  vinTimestampDescIdx: index('telemetry_vin_timestamp_desc_idx').on(table.vehicleVin, table.timestamp.desc()),
+  recentTimestampIdx: index('telemetry_recent_timestamp_idx').on(table.timestamp.desc()),
+  fuelLevelIdx: index('telemetry_fuel_level_idx').on(table.fuelBatteryLevel),
+  speedIdx: index('telemetry_speed_idx').on(table.speed),
+  odometerTimestampIdx: index('telemetry_odometer_timestamp_idx').on(table.vehicleVin, table.odometerReading, table.timestamp.desc()),
 }))
 
 export const alerts = pgTable('alerts', {
@@ -44,4 +52,9 @@ export const alerts = pgTable('alerts', {
   severityIdx: index('alerts_severity_idx').on(table.severity),
   resolvedIdx: index('alerts_resolved_idx').on(table.resolved),
   createdAtIdx: index('alerts_created_at_idx').on(table.createdAt),
+  typeCreatedAtIdx: index('alerts_type_created_at_idx').on(table.alertType, table.createdAt.desc()),
+  severityCreatedAtIdx: index('alerts_severity_created_at_idx').on(table.severity, table.createdAt.desc()),
+  resolvedCreatedAtIdx: index('alerts_resolved_created_at_idx').on(table.resolved, table.createdAt.desc()),
+  typeSeverityIdx: index('alerts_type_severity_idx').on(table.alertType, table.severity),
+  recentAlertsIdx: index('alerts_recent_idx').on(table.createdAt.desc()),
 }))

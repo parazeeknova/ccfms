@@ -1,4 +1,5 @@
 import process from 'node:process'
+import cors from 'cors'
 import express from 'express'
 import { db } from './db/connection'
 import { healthCheckLimiter } from './middleware/rateLimiter'
@@ -8,6 +9,13 @@ import vehicleRoutes from './routes/vehicles'
 
 const app = express()
 const port = process.env.PORT || 3000
+
+app.use(cors({
+  origin: ['http://localhost:5173', 'http://localhost:3000'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}))
 
 app.use(express.json())
 
