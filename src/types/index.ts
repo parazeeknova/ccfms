@@ -13,3 +13,17 @@ export interface Vehicle {
   createdAt: Date
   updatedAt: Date
 }
+
+export interface TelemetryData {
+  id: number
+  vehicleVin: string
+  latitude: number
+  longitude: number
+  speed: number
+  engineStatus: 'On' | 'Off' | 'Idle'
+  fuelBatteryLevel: number
+  odometerReading: number
+  diagnosticCodes?: string[]
+  timestamp: Date
+  createdAt: Date
+}
