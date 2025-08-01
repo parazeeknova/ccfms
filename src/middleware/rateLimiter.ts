@@ -57,7 +57,7 @@ export const updateLimiter = rateLimit({
 
 export const healthCheckLimiter = rateLimit({
   windowMs: 1 * 60 * 1000,
-  max: 10,
+  max: 2,
   message: {
     error: 'Too many health check requests from this IP',
     retryAfter: '1 minute',
