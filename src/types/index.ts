@@ -27,3 +27,15 @@ export interface TelemetryData {
   timestamp: Date
   createdAt: Date
 }
+
+export interface Alert {
+  id: number
+  vehicleVin: string
+  telemetryId?: number
+  alertType: string
+  severity: 'Low' | 'Medium' | 'High' | 'Critical'
+  message: string
+  resolved: boolean
+  createdAt: Date
+  resolvedAt?: Date
+}

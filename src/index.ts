@@ -1,6 +1,7 @@
 import process from 'node:process'
 import express from 'express'
 import { db } from './db/connection'
+import alertRoutes from './routes/alerts'
 import telemetryRoutes from './routes/telemetry'
 import vehicleRoutes from './routes/vehicles'
 
@@ -21,6 +22,7 @@ app.get('/health', async (req, res) => {
 
 app.use('/vehicles', vehicleRoutes)
 app.use('/telemetry', telemetryRoutes)
+app.use('/alerts', alertRoutes)
 
 app.listen(port, () => {
   console.log(`running on port ${port}`)

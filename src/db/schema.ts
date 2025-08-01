@@ -1,4 +1,4 @@
-import { decimal, index, jsonb, pgTable, serial, timestamp, varchar } from 'drizzle-orm/pg-core'
+import { boolean, decimal, index, integer, jsonb, pgTable, serial, text, timestamp, varchar } from 'drizzle-orm/pg-core'
 
 export const vehicles = pgTable('vehicles', {
   id: serial('id').primaryKey(),
@@ -27,4 +27,21 @@ export const telemetry = pgTable('telemetry', {
 }, table => ({
   vinTimestampIdx: index('telemetry_vin_timestamp_idx').on(table.vehicleVin, table.timestamp),
   timestampIdx: index('telemetry_timestamp_idx').on(table.timestamp),
+}))
+
+export const alerts = pgTable('alerts', {
+  id: serial('id').primaryKey(),
+  vehicleVin: varchar('vehicle_vin', { length: 10 }).notNull().references(() => vehicles.vin),
+  telemetryId: integer('telemetry_id').references(() => telemetry.id),
+  alertType: varchar('alert_type', { length: 50 }).notNull(),
+  severity: varchar('severity', { length: 20 }).notNull(),
+  message: text('message').notNull(),
+  resolved: boolean('resolved').default(false).notNull(),
+  createdAt: timestamp('created_at').defaultNow(),
+  resolvedAt: timestamp('resolved_at'),
+}, table => ({
+  vinTypeIdx: index('alerts_vin_type_idx').on(table.vehicleVin, table.alertType),
+  severityIdx: index('alerts_severity_idx').on(table.severity),
+  resolvedIdx: index('alerts_resolved_idx').on(table.resolved),
+  createdAtIdx: index('alerts_created_at_idx').on(table.createdAt),
 }))
