@@ -1,10 +1,17 @@
 import { Router } from 'express'
+import {
+  createLimiter,
+  generalLimiter,
+  readLimiter,
+} from '../middleware/rateLimiter'
 import { AlertService } from '../services/alert'
 
 const router = Router()
 const alertService = new AlertService()
 
-router.post('/', async (req, res) => {
+router.use(generalLimiter)
+
+router.post('/', createLimiter, async (req, res) => {
   try {
     const alertData = {
       vehicleVin: req.body.vehicleVin,
@@ -28,8 +35,12 @@ router.post('/', async (req, res) => {
   }
 })
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', readLimiter, async (req, res) => {
   try {
+    if (!req.params.id) {
+      return res.status(400).json({ error: 'alert ID parameter is required' })
+    }
+
     const id = Number.parseInt(req.params.id)
     if (Number.isNaN(id)) {
       return res.status(400).json({ error: 'invalid alert ID' })
@@ -51,7 +62,7 @@ router.get('/:id', async (req, res) => {
   }
 })
 
-router.get('/count/total', async (req, res) => {
+router.get('/count/total', readLimiter, async (req, res) => {
   try {
     const { vehicleVin, alertType, severity, resolved, startTime, endTime } = req.query
 

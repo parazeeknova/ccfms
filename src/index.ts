@@ -1,6 +1,7 @@
 import process from 'node:process'
 import express from 'express'
 import { db } from './db/connection'
+import { healthCheckLimiter } from './middleware/rateLimiter'
 import alertRoutes from './routes/alerts'
 import telemetryRoutes from './routes/telemetry'
 import vehicleRoutes from './routes/vehicles'
@@ -10,7 +11,7 @@ const port = process.env.PORT || 3000
 
 app.use(express.json())
 
-app.get('/health', async (req, res) => {
+app.get('/health', healthCheckLimiter, async (req, res) => {
   try {
     await db.execute('SELECT 1')
     res.json({ status: 'ok', database: 'connected' })

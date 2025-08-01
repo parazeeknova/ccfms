@@ -1,10 +1,18 @@
 import { Router } from 'express'
+import {
+  createLimiter,
+  generalLimiter,
+  heavyOperationLimiter,
+  readLimiter,
+} from '../middleware/rateLimiter'
 import { TelemetryService } from '../services/telemetry'
 
 const router = Router()
 const telemetryService = new TelemetryService()
 
-router.post('/', async (req, res) => {
+router.use(generalLimiter)
+
+router.post('/', createLimiter, async (req, res) => {
   try {
     const telemetryData = {
       vehicleVin: req.body.vehicleVin,
@@ -31,9 +39,13 @@ router.post('/', async (req, res) => {
   }
 })
 
-router.get('/:vin/history', async (req, res) => {
+router.get('/:vin/history', heavyOperationLimiter, async (req, res) => {
   try {
     const { vin } = req.params
+    if (!vin) {
+      return res.status(400).json({ error: 'VIN parameter is required' })
+    }
+
     const { startTime, endTime } = req.query
 
     let start: Date | undefined
@@ -70,9 +82,13 @@ router.get('/:vin/history', async (req, res) => {
   }
 })
 
-router.get('/:vin/latest', async (req, res) => {
+router.get('/:vin/latest', readLimiter, async (req, res) => {
   try {
     const { vin } = req.params
+    if (!vin) {
+      return res.status(400).json({ error: 'VIN parameter is required' })
+    }
+
     const latest = await telemetryService.getLatestTelemetry(vin)
     res.json(latest)
   }

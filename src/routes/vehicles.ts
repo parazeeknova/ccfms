@@ -1,10 +1,19 @@
 import { Router } from 'express'
+import {
+  createLimiter,
+  deleteLimiter,
+  generalLimiter,
+  readLimiter,
+  updateLimiter,
+} from '../middleware/rateLimiter'
 import { VehicleService } from '../services/vehicle'
 
 const router = Router()
 const vehicleService = new VehicleService()
 
-router.post('/', async (req, res) => {
+router.use(generalLimiter)
+
+router.post('/', createLimiter, async (req, res) => {
   try {
     const vehicle = await vehicleService.createVehicle(req.body)
     res.status(201).json(vehicle)
@@ -19,7 +28,7 @@ router.post('/', async (req, res) => {
   }
 })
 
-router.get('/', async (req, res) => {
+router.get('/', readLimiter, async (req, res) => {
   try {
     const { manufacturer, fleetId, registrationStatus } = req.query
     const filters = {
@@ -42,9 +51,14 @@ router.get('/', async (req, res) => {
   }
 })
 
-router.get('/:vin', async (req, res) => {
+router.get('/:vin', readLimiter, async (req, res) => {
   try {
-    const vehicle = await vehicleService.getVehicleByVin(req.params.vin)
+    const vin = req.params.vin
+    if (!vin) {
+      return res.status(400).json({ error: 'VIN parameter is required' })
+    }
+
+    const vehicle = await vehicleService.getVehicleByVin(vin)
     res.json(vehicle)
   }
   catch (error) {
@@ -60,9 +74,14 @@ router.get('/:vin', async (req, res) => {
   }
 })
 
-router.put('/:vin', async (req, res) => {
+router.put('/:vin', updateLimiter, async (req, res) => {
   try {
-    const vehicle = await vehicleService.updateVehicle(req.params.vin, req.body)
+    const vin = req.params.vin
+    if (!vin) {
+      return res.status(400).json({ error: 'VIN parameter is required' })
+    }
+
+    const vehicle = await vehicleService.updateVehicle(vin, req.body)
     res.json(vehicle)
   }
   catch (error) {
@@ -78,9 +97,15 @@ router.put('/:vin', async (req, res) => {
   }
 })
 
-router.delete('/:vin', async (req, res) => {
+// Delete vehicle - very strict rate limiting (destructive operation)
+router.delete('/:vin', deleteLimiter, async (req, res) => {
   try {
-    await vehicleService.deleteVehicle(req.params.vin)
+    const vin = req.params.vin
+    if (!vin) {
+      return res.status(400).json({ error: 'VIN parameter is required' })
+    }
+
+    await vehicleService.deleteVehicle(vin)
     res.status(204).send()
   }
   catch (error) {
