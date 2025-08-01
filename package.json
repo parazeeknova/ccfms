@@ -3,10 +3,12 @@
   "type": "module",
   "module": "src/index.ts",
   "scripts": {
-    "start": "bun src/index.ts",
+    "dev": "bun --watch src/index.ts",
     "lint": "eslint .",
     "format": "eslint . --fix",
-    "typec": "tsc --noEmit"
+    "typec": "tsc --noEmit",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "bun src/db/migrate.ts"
   },
   "dependencies": {
     "drizzle-orm": "^0.44.4",

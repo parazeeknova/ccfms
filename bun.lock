@@ -17,7 +17,7 @@
         "drizzle-kit": "^0.31.4",
         "eslint": "^9.32.0",
         "lefthook": "^1.12.2",
-        "typescript": "^5.9.2",
+        "typescript": "^5.9.0",
       },
     },
   },
