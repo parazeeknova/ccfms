@@ -1,0 +1,6 @@
+pre-commit:
+  commands:
+    lint:
+      run: bun run format
+    type-check:
+      run: bun run typec
